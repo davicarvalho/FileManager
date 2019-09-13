@@ -69,11 +69,16 @@ public class FileOperations {
 		return 0;
 	}
 
-	public Integer getEnderecoUltimoByteDaTupla() throws Exception {
+	public Integer getEnderecoPrimeiroByteLivreDoBloco() throws Exception {
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		if (getTamanhoTupleDirectory() == 0) {
 			return getEnderecoProximoBlocoLivre() + tamanhoBlocos - 1;
 		} else {
-			return -1;
+			Integer comecoDoBloco = getEnderecoComecoBlocoAtual();
+			raf.seek(comecoDoBloco + 7);
+			byte b[] = new byte[2];
+			raf.read(b, 0, 2);
+			return Integer.parseInt(new String(b)) ;
 		}
 	}
 
@@ -90,11 +95,10 @@ public class FileOperations {
 
 		aumentarTupleDir();
 		addEnderecoTupleDir(endereco);
-
-		// ????? alterar endereco ultimo byte da tupla no bloco de controle
+		alterarUltimoByteDaTupla(endereco);
+		
 	}
-
-
+	
 	private void aumentarTupleDir() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		Integer endereco = getEnderecoProximoBlocoLivre();
@@ -104,13 +108,21 @@ public class FileOperations {
 		raf.write(lpad2(tamAtual).getBytes());
 	}
 	
-	private void addEnderecoTupleDir(Integer enderecoTupla)  throws Exception {
+	private void addEnderecoTupleDir(Integer enderecoTupla) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		Integer tamTupleDir = getTamanhoTupleDirectory();
+		//9 se refere ao tamanho do header ate o tuple dir
+		//-2 pois o tamanho do tuple dir eh aumentado antes
 		raf.seek(getEnderecoComecoBlocoAtual() + 9 + tamTupleDir - 2);
 		raf.write(lpad2(enderecoTupla).getBytes());
-		
 	}
+	
+	private void alterarUltimoByteDaTupla(Integer enderecoTupla) throws Exception {
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		raf.seek(getEnderecoComecoBlocoAtual() + 7);
+		raf.write(lpad2(enderecoTupla).getBytes());
+	}
+	
 	
 	private Integer getEnderecoComecoBlocoAtual() throws Exception {
 		Integer tamBlocoControle = getTamanhoBlocoDeControle();
@@ -124,7 +136,7 @@ public class FileOperations {
 		String idBloco = lpad3(getIdProximoBloco());
 		String tipoBloco = "0";
 		String tamanhoTupleDirectory = lpad2(getTamanhoTupleDirectory());
-		String enderecoUltimoByteDaTupla = lpad2(getEnderecoUltimoByteDaTupla());
+		String enderecoUltimoByteDaTupla = lpad2(getEnderecoPrimeiroByteLivreDoBloco());
 
 		raf.seek(getEnderecoProximoBlocoLivre());
 
@@ -137,11 +149,11 @@ public class FileOperations {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		String tupla = getTupla(id, nome);
 
-		Integer endereco = getEnderecoUltimoByteDaTupla() - tupla.length();
+		Integer endereco = getEnderecoPrimeiroByteLivreDoBloco() - tupla.length();
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
-		System.out.println(tupla);
+		System.out.println(tupla + ", tamanho: "+ getTamanhoTupla(id, nome));
 
 		return endereco;
 	}

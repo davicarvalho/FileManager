@@ -7,7 +7,8 @@ public class App {
 		FileOperations op = new FileOperations();
 		op.createFile();
 		op.addSomeData("1", "hannah");
-		
+		op.addSomeData("2", "jbmmbj");
+
 		op.printBlocos();
 	}
 	
