@@ -47,15 +47,36 @@ public class FileOperations {
 		return getTamanhoBlocoDeControle() + tamanhoBlocos * (getIdProximoBloco() - 1);
 	}
 
-	public void atualizarIdProximoBlocoLivre() throws Exception {
+	public void atualizarIdProximoBlocoLivre(Integer tamanhoDaTupla) throws Exception {
+		
+		Integer espacoLivreDoBloco = getEspacoLivreDoBloco(getIdProximoBloco());
+		if((tamanhoDaTupla + 2) > espacoLivreDoBloco) {
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+			raf.seek(5);
+			byte b[] = new byte[4];
+			raf.read(b, 0, 4);
+			String s = new String(b);
+			Integer id = Integer.parseInt(s) + 1;
+			raf.write(lpad4(id).getBytes());
+			System.out.println("id prox bloco livre: " + id);
+		}
+	}
+	
+	private Integer getEspacoLivreDoBloco(Integer id) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
-		raf.seek(5);
-		byte b[] = new byte[4];
-		raf.read(b, 0, 4);
-		String s = new String(b);
-		Integer id = Integer.parseInt(s) + 1;
-		raf.write(lpad4(id).getBytes());
-		System.out.println("id prox bloco livre: " + id);
+		// 7 eh referente a posicao do ultimo byte da tupla utilizado
+		Integer idProxBlocoLivre = getEnderecoProximoBlocoLivre() ;
+		raf.seek(idProxBlocoLivre + 7);
+		byte b[] = new byte[2];
+		raf.read(b, 0, 2);
+		Integer byteFinal = Integer.parseInt(new String(b));
+//		Integer tamanhoBlocosAnteriores = (getIdProximoBloco() - 1) * tamanhoBlocos;
+//		Integer tamBlocoDeControle = getTamanhoBlocoDeControle();
+//		Integer byteFinalComOffset = byteFinal - tamanhoBlocosAnteriores - tamBlocoDeControle + 1;
+		Integer tamTupleDir = getTamanhoTupleDirectory();
+		
+		Integer espacoLivre = byteFinal - (tamTupleDir + 9);
+		return espacoLivre;
 	}
 
 	public Integer getTamanhoTupleDirectory() throws Exception {
@@ -83,11 +104,12 @@ public class FileOperations {
 	}
 
 	public void addSomeData(String id, String nome) throws Exception {
-
-		// alterar bloco de controle caso o bloco encha ou verificar se tupla cabe no
-		// bloco
-
-		if (getTamanhoTupleDirectory() == 0) {
+		
+		validarTamanhoDaTuplaEmRelacaoAoTamamnhoDoBloco(getTamanhoTupla(id, nome));
+		
+		if(getTamanhoTupleDirectory()>0) {
+			atualizarIdProximoBlocoLivre(getTamanhoTupla(id, nome));
+		}else {
 			escreverHeader();
 		}
 
@@ -99,6 +121,12 @@ public class FileOperations {
 		
 	}
 	
+	private void validarTamanhoDaTuplaEmRelacaoAoTamamnhoDoBloco(Integer tamanhoTupla)  throws Exception {
+		if(tamanhoTupla > (tamanhoBlocos - 11)) {
+			throw new Exception("Tupla grande demais para o bloco");
+		}
+	}
+
 	private void aumentarTupleDir() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		Integer endereco = getEnderecoProximoBlocoLivre();
@@ -148,12 +176,13 @@ public class FileOperations {
 	private Integer escreverTupla(String id, String nome) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		String tupla = getTupla(id, nome);
-
-		Integer endereco = getEnderecoPrimeiroByteLivreDoBloco() - tupla.length();
+		Integer enderecoLivre = getEnderecoPrimeiroByteLivreDoBloco();
+		Integer endereco = enderecoLivre - tupla.length() + 1;
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
-		System.out.println(tupla + ", tamanho: "+ getTamanhoTupla(id, nome));
+		System.out.println(tupla + ", tamanho: "+ getTamanhoTupla(id, nome)
+		+" escrevendo do byte: "+enderecoLivre + " ao byte: "+(endereco));
 
 		return endereco;
 	}
@@ -227,7 +256,6 @@ public class FileOperations {
 			byte b[] = new byte[tamanhoBlocos];
 			raf.read(b, 0, tamanhoBlocos);
 			String s = new String(b);
-			s.length();
 			Integer m = Integer.parseInt(s.substring(5, 7));
 
 			System.out.println("Byte 0 (id container): " + s.substring(0, 1));
@@ -235,8 +263,9 @@ public class FileOperations {
 			System.out.println("Byte 4 (tipo): " + s.substring(4, 5));
 			System.out.println("Byte 5-6 (tam tuple dir): " + s.substring(5, 7));
 			System.out.println("Byte 7-8 (ultimo byte de tupla): " + s.substring(7, 9));
-			System.out.println("Byte 9-" + m + " (tuple dir): " + s.substring(9, 9 + m + 1));
+			System.out.println("Byte 9-" + (m+9) + " (tuple dir): " + s.substring(9, 9 + m + 1));
 			System.out.println("Byte ??-" + tamanhoBlocos + " (dados): " + s.substring(m + 9 + 1));
+			System.out.println("All-"+ s);
 		}
 
 	}
