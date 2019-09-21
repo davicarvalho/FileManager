@@ -93,6 +93,15 @@ public class FileOperations {
 		}
 		return 0;
 	}
+	
+	public Integer getTamanhoTupleDirectory(Integer idBloco) throws Exception {
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer endereco = getTamanhoBlocoDeControle() + (idBloco -1)*tamanhoBlocos;
+		raf.seek(endereco + 5);
+		byte b[] = new byte[2];
+		raf.read(b, 0, 2);
+		return Integer.parseInt(new String(b));
+	}
 
 	public void addSomeData(String id, String nome) throws Exception {
 
@@ -120,7 +129,7 @@ public class FileOperations {
 		String tupla = getTupla(id, nome);
 		Integer enderecoLivre = getEnderecoPrimeiroByteLivreDoBloco();
 		
-		Integer endereco = enderecoLivre - tupla.length();//+ (getIdBlocoAtual() - 1) * tamanhoBlocos;
+		Integer endereco = enderecoLivre - getTamanhoTupla(id, nome) ;//+ (getIdBlocoAtual() - 1) * tamanhoBlocos;
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
@@ -130,7 +139,7 @@ public class FileOperations {
 		
 		System.out.println(tupla + ", tamanho: " + getTamanhoTupla(id, nome) + 
 				" escrevendo do byte: "+ (endereco ) + 
-				" ao byte: " + (tupla.getBytes().length + endereco ));
+				" ao byte: " + (getTamanhoTupla(id, nome) + endereco ));
 
 		return  endereco - comecoDoBloco -1 ;
 	}
@@ -218,6 +227,33 @@ public class FileOperations {
 
 		Integer quantidadeDeBlocosDeDados = (tamFile - tamBlocoControle + 1) / tamanhoBlocos;
 		return quantidadeDeBlocosDeDados;
+	}
+	
+	//TODO nao pronto, funciona apenas para tupas de tamanho 15
+	public void printPrimeiraTuplaDoBloco(Integer idBloco) throws Exception{
+		String tp = getTupleDirectory(idBloco);
+		Integer primeiroValorTP = Integer.parseInt(tp.substring(0, 2));
+
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer tamBlocoControle = getTamanhoBlocoDeControle();
+		Integer endereco = tamBlocoControle + (idBloco - 1) * tamanhoBlocos + primeiroValorTP +1 ;
+		
+		raf.seek(endereco);
+		byte b[] = new byte[15];
+		raf.read(b, 0, 15);
+		
+		System.out.println(new String(b));
+	}
+	
+	public String getTupleDirectory(Integer idBloco) throws Exception{
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer tamBlocoControle = getTamanhoBlocoDeControle();
+		Integer endereco = tamBlocoControle + (idBloco - 1) * tamanhoBlocos;
+		raf.seek(endereco+ 9);
+		byte b[] = new byte[getTamanhoTupleDirectory(idBloco)];
+		raf.read(b, 0, 2);
+		String tp = new String(b);
+		return tp;
 	}
 
 	private void printBlocoDeControle() throws Exception {
