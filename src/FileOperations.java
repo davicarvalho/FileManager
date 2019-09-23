@@ -3,11 +3,17 @@ import java.io.RandomAccessFile;
 public class FileOperations {
 
 	String fileName = "/Users/davicarvalho/Desktop/teste.txt";
-	Integer tamanhoBlocos = 64;
+	Integer tamanhoBlocos = 1024;
 	String idContainer;
-
+	String definicao;
+	
 	public FileOperations() {
-		idContainer = "0";
+		this.idContainer = "0";
+	}
+
+	public FileOperations(String idContainer, String definicao) {
+		this.idContainer = idContainer;
+		this.definicao = definicao;
 	}
 
 	public void createFile() throws Exception {
@@ -120,7 +126,44 @@ public class FileOperations {
 		aumentarTupleDir();
 		addEnderecoTupleDir(endereco);
 		alterarUltimoByteDaTupla(endereco);
+	}
+	
+	public void addSomeData(Tupla t) throws Exception {
 
+		validarTamanhoDaTuplaEmRelacaoAoTamamnhoDoBloco(t.getTamanhoTupla());
+		if (getTamanhoTupleDirectory() > 0) {
+			boolean houveMudancaDeBloco = atualizarIdProximoBlocoLivre(t.getTamanhoTupla());
+			if (houveMudancaDeBloco) {
+				escreverHeader();
+			}
+		} else {
+			escreverHeader();
+		}
+
+		Integer endereco = escreverTupla(t);
+
+		aumentarTupleDir();
+		addEnderecoTupleDir(endereco);
+		alterarUltimoByteDaTupla(endereco);
+
+	}
+	
+	
+	private Integer escreverTupla(Tupla t) throws Exception {
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer comecoDoBloco = getEnderecoComecoBlocoAtual();
+		String tupla = t.getTupla();
+		Integer enderecoLivre = getEnderecoPrimeiroByteLivreDoBloco();
+		
+		Integer endereco = enderecoLivre - t.getTamanhoTupla();//+ (getIdBlocoAtual() - 1) * tamanhoBlocos;
+		raf.seek(endereco);
+		raf.write(tupla.getBytes());
+
+		System.out.println(tupla + ", tamanho: " + t.getTamanhoTupla() + 
+				" escrevendo do byte: "+ (endereco ) + 
+				" ao byte: " + (t.getTamanhoTupla() + endereco ));
+
+		return  endereco - comecoDoBloco -1 ;
 	}
 	
 	private Integer escreverTupla(String id, String nome) throws Exception {
@@ -133,10 +176,6 @@ public class FileOperations {
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
-//		System.out.println(tupla + ", tamanho: " + getTamanhoTupla(id, nome) + 
-//				" escrevendo do byte: "+ (endereco - comecoDoBloco) + 
-//				" ao byte: " + (tupla.getBytes().length + endereco - comecoDoBloco));
-		
 		System.out.println(tupla + ", tamanho: " + getTamanhoTupla(id, nome) + 
 				" escrevendo do byte: "+ (endereco ) + 
 				" ao byte: " + (getTamanhoTupla(id, nome) + endereco ));
@@ -210,11 +249,13 @@ public class FileOperations {
 	}
 
 	private String getTupla(String id, String nome) {
+
 		String col1 = lpad2(id.length()) + id;
 		String col2 = lpad2(nome.length()) + nome;
 		String tupla = lpad4(col1.length() + col2.length()) + col1 + col2;
 		return tupla;
 	}
+	
 
 	private Integer getTamanhoTupla(String id, String nome) {
 		return getTupla(id, nome).getBytes().length;
