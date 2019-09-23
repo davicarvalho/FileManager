@@ -1,7 +1,6 @@
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.ByteChannel;
 
 public class FileOperations {
 
@@ -32,6 +31,8 @@ public class FileOperations {
 				+ descritor;
 
 		raf.write(blocoDeControle.getBytes());
+		
+		raf.close();
 	}
 
 	public Integer getTamanhoBlocoDeControle() throws Exception {
@@ -40,6 +41,7 @@ public class FileOperations {
 		byte b[] = new byte[2];
 		raf.read(b, 0, 2);
 		String s = new String(b);
+		raf.close();
 		return 11 + Integer.parseInt(s);
 	}
 
@@ -49,6 +51,7 @@ public class FileOperations {
 		byte b[] = new byte[4];
 		raf.read(b, 0, 4);
 		String s = new String(b);
+		raf.close();
 		return Integer.parseInt(s);
 	}
 
@@ -61,10 +64,12 @@ public class FileOperations {
 			raf.read(b, 0, 4);
 			String s = new String(b);
 			Integer id = Integer.parseInt(s) + 1;
+			raf.close();
 			raf = new RandomAccessFile(fileName, "rw");
 			raf.seek(5);
 			raf.write(lpad4(id).getBytes());
 			System.out.println("id prox bloco livre: " + id);
+			raf.close();
 			return true;
 		}
 		return false;
@@ -84,6 +89,7 @@ public class FileOperations {
 		Integer tamTupleDir = getTamanhoTupleDirectory();
 
 		Integer espacoLivre = byteFinal - (tamTupleDir + 9);
+		raf.close();
 		return espacoLivre;
 	}
 
@@ -101,8 +107,10 @@ public class FileOperations {
 			raf.seek(getEnderecoProximoBlocoLivre() + 5);
 			byte b[] = new byte[2];
 			raf.read(b, 0, 2);
+			raf.close();
 			return Integer.parseInt(new String(b));
 		}
+		raf.close();
 		return 0;
 	}
 	
@@ -112,6 +120,7 @@ public class FileOperations {
 		raf.seek(endereco + 5);
 		byte b[] = new byte[2];
 		raf.read(b, 0, 2);
+		raf.close();
 		return Integer.parseInt(new String(b));
 	}
 
@@ -169,6 +178,7 @@ public class FileOperations {
 				" escrevendo do byte: "+ (endereco ) + 
 				" ao byte: " + (t.getTamanhoTupla() + endereco ));
 
+		raf.close();
 		return  endereco - comecoDoBloco -1 ;
 	}
 	
@@ -185,7 +195,7 @@ public class FileOperations {
 		System.out.println(tupla + ", tamanho: " + getTamanhoTupla(id, nome) + 
 				" escrevendo do byte: "+ (endereco ) + 
 				" ao byte: " + (getTamanhoTupla(id, nome) + endereco ));
-
+		raf.close();
 		return  endereco - comecoDoBloco -1 ;
 	}
 	
@@ -196,16 +206,17 @@ public class FileOperations {
 
 	//TODO aqui
 	public Integer getEnderecoPrimeiroByteLivreDoBloco() throws Exception {
-		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		if (getTamanhoTupleDirectory() == 0) {
 			return getEnderecoProximoBlocoLivre() + tamanhoBlocos - 1 ;//- (getIdBlocoAtual() - 1) * tamanhoBlocos;
 		} else {
+			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			Integer comecoDoBloco = getEnderecoComecoBlocoAtual();
 			raf.seek(comecoDoBloco + 7);
 			byte b[] = new byte[2];
 			raf.read(b, 0, 2);
 			Short s = bytesToShort(b);
 //			Integer data = Integer.parseInt(new String(b));
+			raf.close();
 			return (s + comecoDoBloco);
 		}
 	}
@@ -223,6 +234,7 @@ public class FileOperations {
 		tamAtual += 2;
 		raf.seek(endereco + 5);
 		raf.write(lpad2(tamAtual).getBytes());
+		raf.close();
 	}
 
 	//TODO aqui
@@ -234,6 +246,7 @@ public class FileOperations {
 		raf.seek(getEnderecoComecoBlocoAtual() + 9 + tamTupleDir - 2);
 		
 		raf.write(shortToBytes(enderecoTupla.shortValue()));
+		raf.close();
 	}
 
 	//TODO aqui
@@ -241,6 +254,7 @@ public class FileOperations {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		raf.seek(getEnderecoComecoBlocoAtual() + 7);
 		raf.write(shortToBytes(enderecoTupla.shortValue()));
+		raf.close();
 	}
 
 
@@ -257,6 +271,7 @@ public class FileOperations {
 		String header = idContainer + idBloco + tipoBloco + tamanhoTupleDirectory + enderecoUltimoByteDaTupla;
 
 		raf.write(header.getBytes());
+		raf.close();
 	}
 
 	private String getTupla(String id, String nome) {
@@ -278,6 +293,7 @@ public class FileOperations {
 		Integer tamBlocoControle = getTamanhoBlocoDeControle();
 
 		Integer quantidadeDeBlocosDeDados = (tamFile - tamBlocoControle + 1) / tamanhoBlocos;
+		raf.close();
 		return quantidadeDeBlocosDeDados;
 	}
 	
@@ -293,8 +309,7 @@ public class FileOperations {
 		raf.seek(endereco);
 		byte b[] = new byte[15];
 		raf.read(b, 0, 15);
-		
-		System.out.println(new String(b));
+		raf.close();
 	}
 	
 	public String getTupleDirectory(Integer idBloco) throws Exception{
@@ -305,6 +320,7 @@ public class FileOperations {
 		byte b[] = new byte[getTamanhoTupleDirectory(idBloco)];
 		raf.read(b, 0, 2);
 		String tp = new String(b);
+		raf.close();
 		return tp;
 	}
 
@@ -323,6 +339,7 @@ public class FileOperations {
 		System.out.println("Byte 5-8 (id prox bloco): " + s.substring(5, 9));
 		System.out.println("Byte 9-10 (tam desc): " + s.substring(9, 11));
 		System.out.println("Byte 11-?? (desc): " + s.substring(11));
+		raf.close();
 
 	}
 
@@ -347,6 +364,7 @@ public class FileOperations {
 			System.out.println("Byte 7-8 (ultimo byte de tupla): " + s.substring(7, 9));
 			System.out.println("Byte 9-" + (m + 8) + " (tuple dir): " + s.substring(9, 9 + m + 1));
 			System.out.println("Byte " + n + "-" + tamanhoBlocos + " (dados): " + s.substring(m + 9 + 1));
+			raf.close();
 		}
 	}
 

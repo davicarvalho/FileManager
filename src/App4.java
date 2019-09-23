@@ -18,8 +18,6 @@ public class App4 {
    	 	for (Tupla tupla : tuplas) {
 			op.addSomeData(tupla);
 		}
-   	 	
-//   	 	op.printBlocos();
 
 	}
 
@@ -32,7 +30,9 @@ public class App4 {
 	static String extrairDefinicao(File f) {
 		try {
 			BufferedReader b = new BufferedReader(new FileReader(f));
-			return b.readLine();
+			String s = b.readLine();
+			b.close();
+			return s;
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -55,6 +55,7 @@ public class App4 {
                 	tuplas.add(t);
                 }
             }
+            b.close();
             return tuplas;
 
         } catch (IOException e) {
