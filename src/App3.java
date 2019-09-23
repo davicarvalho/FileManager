@@ -12,8 +12,8 @@ public class App3 {
 		prepararArquivo(op);
 		
 		
-		Tupla t1 = new Tupla(def, "4195|Supplier#000004195|NHCu,qYwb21TrXtL8iXEI4QZ|11|21-437-493-6911|s. furiously special requests are. ironically regular packages doubt alongside o|");
-		Tupla t2 = new Tupla(def, "639|Supplier#000000639|WGqnQRU1xoC,UV9xDGjc48rC4Cow4|9|19-128-575-2303|sual theodolites. slyly even accounts according to the quickly special accounts are f|");
+		TuplaArquivoDeEntrada t1 = new TuplaArquivoDeEntrada(def, "4195|Supplier#000004195|NHCu,qYwb21TrXtL8iXEI4QZ|11|21-437-493-6911|s. furiously special requests are. ironically regular packages doubt alongside o|");
+		TuplaArquivoDeEntrada t2 = new TuplaArquivoDeEntrada(def, "639|Supplier#000000639|WGqnQRU1xoC,UV9xDGjc48rC4Cow4|9|19-128-575-2303|sual theodolites. slyly even accounts according to the quickly special accounts are f|");
 
 		System.out.println(t1.getTamanhoTupla());
 //		

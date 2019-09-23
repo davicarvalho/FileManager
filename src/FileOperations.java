@@ -8,6 +8,7 @@ public class FileOperations {
 	Integer tamanhoBlocos = 800;
 	String idContainer;
 	String definicao;
+	Integer qtdColunas;
 	
 	public FileOperations() {
 		this.idContainer = "0";
@@ -143,8 +144,8 @@ public class FileOperations {
 		alterarUltimoByteDaTupla(endereco);
 	}
 	
-	public void addSomeData(Tupla t) throws Exception {
-
+	public void addSomeData(TuplaArquivoDeEntrada t) throws Exception {
+		
 		validarTamanhoDaTuplaEmRelacaoAoTamamnhoDoBloco(t.getTamanhoTupla());
 		if (getTamanhoTupleDirectory() > 0) {
 			boolean houveMudancaDeBloco = atualizarIdProximoBlocoLivre(t.getTamanhoTupla());
@@ -164,7 +165,8 @@ public class FileOperations {
 	}
 	
 	
-	private Integer escreverTupla(Tupla t) throws Exception {
+	private Integer escreverTupla(TuplaArquivoDeEntrada t) throws Exception {
+		this.qtdColunas = t.getColunas().size();
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		Integer comecoDoBloco = getEnderecoComecoBlocoAtual();
 		String tupla = t.getTupla();
@@ -323,6 +325,74 @@ public class FileOperations {
 		raf.close();
 		return tp;
 	}
+	
+	public Bloco lerBloco(Integer idBloco) throws Exception{
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer tamBlocoControle = getTamanhoBlocoDeControle();
+		Integer endereco = tamBlocoControle + (idBloco - 1) * tamanhoBlocos;
+		raf.seek(endereco);
+		byte b[] = new byte[6];
+		raf.read(b, 0, 6);
+		String primeiros6Bytes = new String(b);
+		raf.close();
+		
+		raf = new RandomAccessFile(fileName, "rw");
+		raf.seek(endereco + 7);
+		b = new byte[2];
+		raf.read(b, 0, 2);
+		Short s = bytesToShort(b);
+		String enderecoUltimoByteTuplaUtilizadoNoBloco = s.toString();
+		raf.close();
+		
+		raf = new RandomAccessFile(fileName, "rw");
+		raf.seek(endereco+9);
+		Integer tamTp = getTamanhoTupleDirectory(idBloco);
+		b = new byte[tamTp];
+		raf.read(b, 0, tamTp);
+	//	String tp = "";
+		Integer valoresTp[] = new Integer[tamTp/2];
+		int j =0;
+		for(int i=0; i<b.length; i+=2) {
+			byte aux[] = new byte[2];
+			aux[0] = b[i];
+			aux[1] = b[i+1];
+			//tp += bytesToShort(aux);
+			valoresTp[j] = new Short(bytesToShort(aux)).intValue();
+			j++;
+		}
+		raf.close();
+		
+		raf = new RandomAccessFile(fileName, "rw");
+		Integer x = endereco+9+tamTp;
+		raf.seek(x);
+		b = new byte[tamanhoBlocos];
+		raf.read(b, 0, tamanhoBlocos - 9 - tamTp);
+		String restoDoBloco = new String(b);
+		raf.close();
+		
+//		System.out.println("Primeiros 4 bytes: "+ primeiros6Bytes.substring(0, 5));
+//		System.out.println("Tamanho tuple dir: "+ tamTp);
+//		System.out.println("Endereco ultimo byte tupla: "+ enderecoUltimoByteTuplaUtilizadoNoBloco);
+//		System.out.println("Tuple dir: "+ getTpFormatado(valoresTp));
+//		System.out.println("Resto do bloco: "+restoDoBloco);
+		
+		Bloco bloco = new Bloco(idBloco, tamanhoBlocos, 
+				primeiros6Bytes, tamTp, Integer.parseInt(enderecoUltimoByteTuplaUtilizadoNoBloco), 
+				valoresTp, restoDoBloco);
+
+		return bloco;
+	}
+
+//	private String getTpFormatado(Integer[] valoresTp) {
+//		String s = "";
+//		for(int i=0; i<valoresTp.length; i++) {
+//			s+= valoresTp[i]+",";
+//		}
+//		if(s.length()>0) {
+//			s = s.substring(0, s.length()-1);
+//		}
+//		return s;
+//	}
 
 	private void printBlocoDeControle() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");

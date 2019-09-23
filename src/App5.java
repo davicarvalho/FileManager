@@ -4,14 +4,13 @@ import java.nio.ByteOrder;
 public class App5 {
 
 	public static void main(String[] args) throws Exception {
-		short s = 350;
+		String restoDoBloco = "04Davi06ahdoiuasgiuodas";
 		
-		byte b [] = shortToBytes(s);
+		Integer tamColuna = Integer.parseInt(restoDoBloco.substring(0, 2));
+		String infoColuna = restoDoBloco.substring(2, 2+tamColuna);
 		
-		short s2 = bytesToShort(b);
-		
-		System.out.println(b.length);
-		System.out.println(s2);
+		System.out.println(infoColuna);
+		System.out.println(restoDoBloco);
 		
 	}
 
