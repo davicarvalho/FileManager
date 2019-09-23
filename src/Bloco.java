@@ -12,7 +12,7 @@ public class Bloco {
 		
 	Integer enderecoUltimoByteTuplaUtilizadoNoBloco;
 	
-	Integer[] valoresTp;
+	Integer[] valoresTpDirectory;
 	
 	ArrayList<Tupla> tuplas;
 	
@@ -30,7 +30,7 @@ public class Bloco {
 		this.tamTp = tamTp;
 
 		this.enderecoUltimoByteTuplaUtilizadoNoBloco = enderecoUltimoByteTuplaUtilizadoNoBloco;
-		this.valoresTp = valoresTp;
+		this.valoresTpDirectory = valoresTp;
 		
 		
 		
@@ -40,7 +40,7 @@ public class Bloco {
 
 	private void popularTuplas(String restoDoBloco) {
 		tuplas = new ArrayList<Tupla>();
-		for(int i = 0; i < valoresTp.length; i++) {
+		for(int i = 0; i < valoresTpDirectory.length; i++) {
 			restoDoBloco = restoDoBloco.trim();
 			String s = restoDoBloco.substring(0, 4);
 			Integer tamTupla = Integer.parseInt(s);
@@ -75,7 +75,7 @@ public class Bloco {
 		System.out.println("Primeiros 4 bytes: "+ primeiros6Bytes.substring(0, 5));
 		System.out.println("Tamanho tuple dir: "+ tamTp);
 		System.out.println("Endereco ultimo byte tupla: "+ enderecoUltimoByteTuplaUtilizadoNoBloco);
-		System.out.println("Tuple dir: "+ getTpFormatado(valoresTp));
+		System.out.println("Tuple dir: "+ getTpFormatado(valoresTpDirectory));
 		System.out.println("Resto do bloco: ");
 		int i = 1;
 		for (Tupla tupla : tuplas) {
@@ -125,11 +125,11 @@ public class Bloco {
 	}
 
 	public Integer[] getValoresTp() {
-		return valoresTp;
+		return valoresTpDirectory;
 	}
 
 	public void setValoresTp(Integer[] valoresTp) {
-		this.valoresTp = valoresTp;
+		this.valoresTpDirectory = valoresTp;
 	}
 
 	public ArrayList<Tupla> getTuplas() {
