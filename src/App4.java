@@ -11,10 +11,15 @@ public class App4 {
 
 		File f = new File("/Users/davicarvalho/Desktop/forn-tpch.txt");
 		String def = extrairDefinicao(f);
+		FileOperations op = new FileOperations("0", def);
+		prepararArquivo(op);
+		
    	 	List<Tupla> tuplas = getTuplas(f, def);
    	 	for (Tupla tupla : tuplas) {
-			System.out.println(tupla.getTupla());
+			op.addSomeData(tupla);
 		}
+   	 	
+//   	 	op.printBlocos();
 
 	}
 
@@ -45,9 +50,8 @@ public class App4 {
             String dados = b.readLine();
 
             while ((dados = b.readLine()) != null) {
-                dados = b.readLine();
                 Tupla t = new Tupla(def, dados);
-                if(tuplas.size() < 30) {
+                if(tuplas.size() < 10000) {
                 	tuplas.add(t);
                 }
             }

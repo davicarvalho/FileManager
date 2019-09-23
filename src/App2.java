@@ -9,12 +9,15 @@ public class App2 {
 				
 		String def = "ID[I(6)]|NOOME[A(25)]|";
 		FileOperations op = new FileOperations("0", def);
+		prepararArquivo(op);
 		
 		Tupla t1 = new Tupla(def, "1|hannah|");
 		System.out.println(t1.getTupla());
 		
-//		op.addSomeData(t1);
-//		op.printBlocos();
+		
+		
+		op.addSomeData(t1);
+		op.printBlocos();
 		
 		
 	}

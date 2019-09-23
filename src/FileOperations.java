@@ -1,9 +1,12 @@
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.ByteChannel;
 
 public class FileOperations {
 
 	String fileName = "/Users/davicarvalho/Desktop/teste.txt";
-	Integer tamanhoBlocos = 1024;
+	Integer tamanhoBlocos = 800;
 	String idContainer;
 	String definicao;
 	
@@ -67,6 +70,8 @@ public class FileOperations {
 		return false;
 	}
 
+	
+	// aqui
 	private Integer getEspacoLivreDoBloco(Integer id) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		// 7 eh referente a posicao do ultimo byte da tupla utilizado
@@ -74,7 +79,8 @@ public class FileOperations {
 		raf.seek(enderecoProxBlocoLivre + 7);
 		byte b[] = new byte[2];
 		raf.read(b, 0, 2);
-		Integer byteFinal = Integer.parseInt(new String(b));
+//		Integer byteFinal = Integer.parseInt(new String(b));
+		Short byteFinal = bytesToShort(b);
 		Integer tamTupleDir = getTamanhoTupleDirectory();
 
 		Integer espacoLivre = byteFinal - (tamTupleDir + 9);
@@ -188,6 +194,7 @@ public class FileOperations {
 		return tamBlocoControle + (getIdBlocoAtual() - 1) * tamanhoBlocos;
 	}
 
+	//TODO aqui
 	public Integer getEnderecoPrimeiroByteLivreDoBloco() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		if (getTamanhoTupleDirectory() == 0) {
@@ -197,8 +204,9 @@ public class FileOperations {
 			raf.seek(comecoDoBloco + 7);
 			byte b[] = new byte[2];
 			raf.read(b, 0, 2);
-			Integer data = Integer.parseInt(new String(b));
-			return (data + comecoDoBloco);
+			Short s = bytesToShort(b);
+//			Integer data = Integer.parseInt(new String(b));
+			return (s + comecoDoBloco);
 		}
 	}
 
@@ -217,19 +225,22 @@ public class FileOperations {
 		raf.write(lpad2(tamAtual).getBytes());
 	}
 
+	//TODO aqui
 	private void addEnderecoTupleDir(Integer enderecoTupla) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		Integer tamTupleDir = getTamanhoTupleDirectory();
 		// 9 se refere ao tamanho do header ate o tuple dir
 		// -2 pois o tamanho do tuple dir eh aumentado antes
 		raf.seek(getEnderecoComecoBlocoAtual() + 9 + tamTupleDir - 2);
-		raf.write(lpad2(enderecoTupla).getBytes());
+		
+		raf.write(shortToBytes(enderecoTupla.shortValue()));
 	}
 
+	//TODO aqui
 	private void alterarUltimoByteDaTupla(Integer enderecoTupla) throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 		raf.seek(getEnderecoComecoBlocoAtual() + 7);
-		raf.write(lpad2(enderecoTupla).getBytes());
+		raf.write(shortToBytes(enderecoTupla.shortValue()));
 	}
 
 
@@ -360,6 +371,17 @@ public class FileOperations {
 			str = "0" + str;
 		}
 		return str;
+	}
+	
+	public short bytesToShort(byte[] bytes) {
+		return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getShort();
+	}
+
+	public byte[] shortToBytes(short value) {
+		byte[] returnByteArray = new byte[2];
+		returnByteArray[0] = (byte) (value & 0xff);
+		returnByteArray[1] = (byte) ((value >>> 8) & 0xff);
+		return returnByteArray;
 	}
 
 	public void printBlocos() throws Exception {

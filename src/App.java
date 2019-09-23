@@ -5,15 +5,13 @@ public class App {
 	public static void main(String[] args) throws Exception {
         FileOperations op = new FileOperations();
 		prepararArquivo(op);
-//		op.addSomeData("4", "robert");
-//		op.addSomeData("5", "smith1");
-//		op.addSomeData("6", "planta");
-//		
-//		
-//		op.addSomeData("7", "morris");
+		op.addSomeData("4", "robert");
+		op.addSomeData("5", "smith1");
+		op.addSomeData("6", "planta");
+		op.addSomeData("7", "morris");
 
 
-		op.printBlocos();
+//		op.printBlocos();
 	}
 	
 	public static void prepararArquivo(FileOperations op) throws Exception {
@@ -22,8 +20,8 @@ public class App {
         file.delete();
 		op.createFile();
 		op.addSomeData("1", "hannah");
-//		op.addSomeData("2", "jbmmbj");
-//		op.addSomeData("3", "wejkbt");
+		op.addSomeData("2", "jbmmbj");
+		op.addSomeData("3", "wejkbt");
 	}
 	
 	//001101106hannah
