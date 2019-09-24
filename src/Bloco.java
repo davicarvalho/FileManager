@@ -32,8 +32,6 @@ public class Bloco {
 		this.enderecoUltimoByteTuplaUtilizadoNoBloco = enderecoUltimoByteTuplaUtilizadoNoBloco;
 		this.valoresTpDirectory = valoresTp;
 		
-		
-		
 		popularTuplas(restoDoBloco);
 		
 	}
@@ -81,6 +79,7 @@ public class Bloco {
 		for (Tupla tupla : tuplas) {
 			System.out.println("\n\nTupla "+i+": ");
 			tupla.printColunas();
+			i++;
 		}
 	}
 	

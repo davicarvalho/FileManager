@@ -23,6 +23,7 @@ public class Tupla {
 			System.out.println("coulna "+i);
 			System.out.println("tamanho = "+coluna.getTamanho());
 			System.out.println("valor = "+coluna.getValor());
+			i++;
 		}
 	}
 
