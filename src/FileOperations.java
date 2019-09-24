@@ -73,7 +73,6 @@ public class FileOperations {
 		}
 		return false;
 	}
-
 	
 	// aqui
 	private Integer getEspacoLivreDoBloco(Integer id) throws Exception {
@@ -157,9 +156,7 @@ public class FileOperations {
 		aumentarTupleDir();
 		addEnderecoTupleDir(endereco);
 		alterarUltimoByteDaTupla(endereco);
-
 	}
-	
 	
 	private Integer escreverTupla(TuplaArquivoDeEntrada t) throws Exception {
 		this.qtdColunas = t.getColunas().size();
@@ -168,7 +165,7 @@ public class FileOperations {
 		String tupla = t.getTupla();
 		Integer enderecoLivre = getEnderecoPrimeiroByteLivreDoBloco();
 		
-		Integer endereco = enderecoLivre - t.getTamanhoTupla();//+ (getIdBlocoAtual() - 1) * tamanhoBlocos;
+		Integer endereco = enderecoLivre - t.getTamanhoTupla();
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
@@ -186,7 +183,7 @@ public class FileOperations {
 		String tupla = getTupla(id, nome);
 		Integer enderecoLivre = getEnderecoPrimeiroByteLivreDoBloco();
 		
-		Integer endereco = enderecoLivre - getTamanhoTupla(id, nome) ;//+ (getIdBlocoAtual() - 1) * tamanhoBlocos;
+		Integer endereco = enderecoLivre - getTamanhoTupla(id, nome) ;
 		raf.seek(endereco);
 		raf.write(tupla.getBytes());
 
