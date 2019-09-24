@@ -83,6 +83,17 @@ public class Bloco {
 			tupla.printColunas();
 		}
 	}
+	
+	//tupla.getValores().iterator().next() retorna um objeto Coluna, que por definicao tem seu primeiro valor como id.
+	public boolean findTupla(String idTupla) {
+		for (Tupla tupla : tuplas) {
+			String s = tupla.getValores().iterator().next().getValor();
+			if(idTupla.equals(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Integer getId() {
 		return id;

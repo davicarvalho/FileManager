@@ -8,10 +8,6 @@ public class FileOperations {
 	String definicao;
 	Integer qtdColunas;
 	
-	public FileOperations() {
-		this.idContainer = "0";
-	}
-
 	public FileOperations(String idContainer, String definicao) {
 		this.idContainer = idContainer;
 		this.definicao = definicao;
@@ -303,6 +299,11 @@ public class FileOperations {
 		String primeiros6Bytes = new String(b);
 		raf.close();
 		
+		int situacaoBloco = Integer.parseInt(primeiros6Bytes.substring(0,1));
+		if(situacaoBloco == 0) {
+			throw new Exception("Bloco deletado");
+		}
+		
 		raf = new RandomAccessFile(fileName, "rw");
 		raf.seek(endereco + 7);
 		b = new byte[2];
@@ -341,6 +342,17 @@ public class FileOperations {
 
 		return bloco;
 	}
+	
+	public void deletarBloco (Integer idBloco) throws Exception{
+		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
+		Integer tamBlocoControle = getTamanhoBlocoDeControle();
+
+		Integer endereco = tamBlocoControle + (idBloco - 1) * tamanhoBlocos;
+		raf.seek(endereco);
+		raf.write("0".getBytes());
+		raf.close();
+	}
+	
 
 	public void printBlocoDeControle() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");

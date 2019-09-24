@@ -11,10 +11,11 @@ public class App4 {
 
 		File f = new File("/Users/davicarvalho/Desktop/forn-tpch.txt");
 		String def = extrairDefinicao(f);
-		FileOperations op = new FileOperations("0", def);
-		prepararArquivo(f, op);
+		FileOperations op = new FileOperations("1", def);
 		
-		Bloco bloco = op.lerBloco(2018);
+//		prepararArquivo(f, op);
+				
+		Bloco bloco = op.lerBloco(6);
 		
 		bloco.printBloco();
 	}
