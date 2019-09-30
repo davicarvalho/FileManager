@@ -39,6 +39,9 @@ public class TuplaArquivoDeEntrada {
 		Integer size = 0;
 		
 		for (String str : valores) {
+			if(str.length() > 99) {
+				str = str.substring(0, 99);
+			}
 			col += lpad2(str.length()) + str;
 			size += str.length() + 2;
 		}

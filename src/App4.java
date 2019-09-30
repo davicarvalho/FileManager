@@ -13,15 +13,20 @@ public class App4 {
 		String def = extrairDefinicao(f);
 		FileOperations op = new FileOperations("1", def);
 		
-//		prepararArquivo(f, op);
-				
-		Bloco bloco = op.lerBloco(6);
+		prepararArquivo(f, op);
 		
-		bloco.printBloco();
+		int x = 1;
+		while(x <= 362) {
+			Bloco bloco = op.lerBloco(x);
+			bloco.printBloco();
+			x++;
+		}
+		
+		
 	}
 
 	public static void prepararArquivo(File input, FileOperations op) throws Exception {
-		File file = new File("/Users/davicarvalho/Desktop/teste.txt");
+		File file = new File("/Users/davicarvalho/Desktop/teste.bin");
 		file.delete();
 		op.createFile();
 		addTuplas(input, op);

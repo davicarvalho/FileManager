@@ -12,12 +12,6 @@ public class App5 {
 		FileOperations op = new FileOperations("1", def);
 		BufferManager bm = new BufferManager(op, 3);
 		
-		//4739
-		//6975
-		//4094
-		//2801
-		//7915
-		
 		String ids[] = new String[10];
 		ids[0] = "4739";
 		ids[1] = "6975";

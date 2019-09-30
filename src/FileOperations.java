@@ -2,11 +2,12 @@ import java.io.RandomAccessFile;
 
 public class FileOperations {
 
-	String fileName = "/Users/davicarvalho/Desktop/teste.txt";
-	Integer tamanhoBlocos = 800;
+	String fileName = "/Users/davicarvalho/Desktop/teste.bin";
+	int tamanhoBlocos = 4096;
 	String idContainer;
 	String definicao;
 	Integer qtdColunas;
+
 	
 	public FileOperations(String idContainer, String definicao) {
 		this.idContainer = idContainer;
@@ -16,16 +17,18 @@ public class FileOperations {
 	public void createFile() throws Exception {
 		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 
-		String strTamanhoBlocos = Utilitarios.lpad3(tamanhoBlocos);
-		String statusContainer = "0";
+//		String strTamanhoBlocos = Utilitarios.lpad3(tamanhoBlocos);
+//		String statusContainer = "0";
 		String idProxBloco = "0001";
 		String tamanhoDescritor = "05";
 		String descritor = "desc1";
 
-		String blocoDeControle = idContainer + strTamanhoBlocos + statusContainer + idProxBloco + tamanhoDescritor
+		String blocoDeControle = idProxBloco + tamanhoDescritor
 				+ descritor;
 
-		raf.write(blocoDeControle.getBytes());
+		raf.writeBytes(idContainer);
+		raf.writeInt(tamanhoBlocos);
+		raf.writeBytes(blocoDeControle);
 		
 		raf.close();
 	}
@@ -62,7 +65,7 @@ public class FileOperations {
 			raf.close();
 			raf = new RandomAccessFile(fileName, "rw");
 			raf.seek(5);
-			raf.write(Utilitarios.lpad4(id).getBytes());
+			raf.writeBytes(Utilitarios.lpad4(id));
 			System.out.println("id prox bloco livre: " + id);
 			raf.close();
 			return true;
@@ -163,7 +166,7 @@ public class FileOperations {
 		
 		Integer endereco = enderecoLivre - t.getTamanhoTupla();
 		raf.seek(endereco);
-		raf.write(tupla.getBytes());
+		raf.writeBytes(tupla);
 
 		System.out.println(tupla + ", tamanho: " + t.getTamanhoTupla() + 
 				" escrevendo do byte: "+ (endereco ) + 
@@ -181,7 +184,7 @@ public class FileOperations {
 		
 		Integer endereco = enderecoLivre - getTamanhoTupla(id, nome) ;
 		raf.seek(endereco);
-		raf.write(tupla.getBytes());
+		raf.writeBytes(tupla);
 
 		System.out.println(tupla + ", tamanho: " + getTamanhoTupla(id, nome) + 
 				" escrevendo do byte: "+ (endereco ) + 
@@ -223,7 +226,7 @@ public class FileOperations {
 		Integer tamAtual = getTamanhoTupleDirectory();
 		tamAtual += 2;
 		raf.seek(endereco + 5);
-		raf.write(Utilitarios.lpad2(tamAtual).getBytes());
+		raf.writeBytes(Utilitarios.lpad2(tamAtual));
 		raf.close();
 	}
 
@@ -260,7 +263,7 @@ public class FileOperations {
 
 		String header = idContainer + idBloco + tipoBloco + tamanhoTupleDirectory + enderecoUltimoByteDaTupla;
 
-		raf.write(header.getBytes());
+		raf.writeBytes(header);
 		raf.close();
 	}
 
@@ -341,16 +344,6 @@ public class FileOperations {
 				valoresTpDirectory, restoDoBloco);
 
 		return bloco;
-	}
-	
-	public void deletarBloco (Integer idBloco) throws Exception{
-		RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
-		Integer tamBlocoControle = getTamanhoBlocoDeControle();
-
-		Integer endereco = tamBlocoControle + (idBloco - 1) * tamanhoBlocos;
-		raf.seek(endereco);
-		raf.write("0".getBytes());
-		raf.close();
 	}
 	
 

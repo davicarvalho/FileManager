@@ -45,10 +45,21 @@ public class Bloco {
 			restoDoBloco = restoDoBloco.substring(4);
 			
 			Tupla t = new Tupla();
+			if(restoDoBloco.length() < tamTupla) {
+				tamTupla = restoDoBloco.length();
+			}
 			String tuplaAtual = restoDoBloco.substring(0, tamTupla);
 			while(tuplaAtual.length() > 0) {
+				System.out.println("\n");
+
 				Integer tamColuna = Integer.parseInt(tuplaAtual.substring(0, 2));
+				
+				if((tuplaAtual.length() - 2) < tamColuna) {
+					tamColuna = tuplaAtual.length() - 2;
+				}
+				
 				String infoColuna = tuplaAtual.substring(2, 2+tamColuna);
+
 				Coluna c = new Coluna(tamColuna, infoColuna);
 				t.addColuna(c);
 				tuplaAtual = tuplaAtual.substring(tamColuna+2);
